@@ -1,51 +1,57 @@
 YUI.add('flickrImageLoader', function(Y) {
-    Y.FlickrImage = Y.Base.create('flickrImage', Y.Model, [], {}, {
+//#######################################################
+/**
+* This is model to hold the flickrimage data
+*
+* @class FlickrImage
+* @constructor
+*/
+//#######################################################
+    Y.FlickrImage = Y.Base.create('flickrImage', Y.Model, [], {
+        sync: function(action, options, callback) {
+            switch(action) {
+            case 'read':
+                Y.YQL("select * from flickr.photos.info where photo_id='"+options.id+"' and api_key='0fbb2b721757f77a6a9d038f4649a2bf'", function(r) {
+                    var photo = r.query.results.photo;
+                    callback(null, photo);
+                });
+                return;
+            default:
+                callback(null, null);
+                return
+            }
+        }
+
+    }, {
         ATTRS: {
-            farm: {
-                value: "9"
-            },
             id: {
-                value: "8311464341"
-            },
-            isfamily: {
-                value: "0"
-            },
-            isfriend: {
-                value: "0"
-            },
-            ispublic: {
-                value: "1"
-            },
-            owner: {
-                value: "66759737@N04"
-            },
-            secret: {
-                value: "f0e606010d"
-            },
-            server: {
-                value: "8075"
-            },
-            title: {
-                value: "Winterwonderland"
+                value: null
             }
         }
     });
 
+
+//#######################################################
+/**
+* This is modelList of FlickrImage
+*
+* @class FlickrImageList
+* @constructor
+*/
+//#######################################################
     Y.FlickrImageList = Y.Base.create('flickrImageList', Y.ModelList, [], {
         model: Y.FlickrImage,
-        sync:function (action, options, callback) {
-            switch (action) {
+        sync: function(action, options, callback) {
+            switch(action) {
             case 'read':
                 Y.YQL("select * from flickr.photos.interestingness(20) where api_key='0fbb2b721757f77a6a9d038f4649a2bf'", function(r) {
-                    //console.log(r.query.results.photo,that);
-                    var photos=r.query.results.photo;
-                    var flickrImages=[];
-                    for(var i=0;i<photos.length;i++){
-                        fi=new Y.FlickrImage(photos[i])
+                    var photos = r.query.results.photo;
+                    var flickrImages = [];
+                    for(var i = 0; i < photos.length; i++) {
+                        fi = new Y.FlickrImage(photos[i])
                         flickrImages.push(fi);
                     }
-                    callback(null,flickrImages);
-                    console.log('cal back done');
+                    callback(null, flickrImages);
                 });
                 return;
             default:
@@ -53,48 +59,98 @@ YUI.add('flickrImageLoader', function(Y) {
                 return
             }
         },
-        parse:function (res){
-            console.log('in parse');
+        parse: function(res) {
             this.add(res);
-            var e={};
-            if(Y.Lang.isArray(res)){
-                e.model=res[res.length-1];    
-            }else{
-                e.model=res;
+            var e = {};
+            if(Y.Lang.isArray(res)) {
+                e.model = res[res.length - 1];
+            } else {
+                e.model = res;
             }
-            this.fire('add',e);
-            console.log(this.toJSON());
+            this.fire('add', e);
         }
     }, {
         ATTRS: {}
     });
 
+//#######################################################
+/**
+* This is view : FlickrImageView
+*
+* @class FlickrImageView
+* @constructor
+*/
+//#######################################################
+    Y.FlickrImageView = Y.Base.create('flickrImageView', Y.View, [], {
+        events: {},
+        template: '<img src="http://farm{farm}.staticflickr.com/{server}/{id}_{secret}.jpg">',
+        initializer: function() {
+            var flickrImage = this.get('model');
+            flickrImage.after('change', this.render, this);
+        },
+        render: function() {
+            var container = this.get('container'),
+                html = '',
+                flickrImage = this.get('model');
+            var template = this.template;
+            if(!flickrImage.get('secret')){
+                flickrImage.load({'id':this.get('model').get('id') });    
+            }
+            container.setHTML(Y.Lang.sub(template, flickrImage.toJSON()));
+            return this;
+        }
+    }, {
+        ATTRS: {
+            container: {
+                valueFn: function() {
+                    return Y.Node.one('#flickrImageList');
+                }
+            },
+            model: {
+                valueFn: function() {
+                    image= new Y.FlickrImage();
+                    image.set('id',2186714153);
+                    return image;
+                }
+            },
+            parentApp: {
+                value: null
+            }
+        }
+    });
+
+//#######################################################
+/**
+* This is view : FlickrImageListView
+*
+* @class FlickrImageListView
+* @constructor
+*/
+//#######################################################
     Y.FlickrImageListView = Y.Base.create('flickrImageListView', Y.View, [], {
         events: {},
         template: '<img src="http://farm{farm}.staticflickr.com/{server}/{id}_{secret}_q.jpg">',
         initializer: function() {
             var flickrImageList = this.get('model');
-            this.template=  Y.Node.one('#flickr-image-listitem-template').getContent();
+            this.template = Y.Node.one('#flickr-image-listitem-template').getContent();
             flickrImageList.after('add', this.render, this);
             flickrImageList.after('change', this.render, this);
             flickrImageList.after('destroy', this.destroy, this);
         },
         render: function() {
-            var container = this.get('container'),html='',flickrImageList=this.get('model');
-            console.log('reder call');
-            if(flickrImageList.isEmpty()){
-                html="<h2>Loading....</h2>"
+            var container = this.get('container'),
+                html = '',
+                flickrImageList = this.get('model');
+            if(flickrImageList.isEmpty()) {
+                html = "<h2>Loading....</h2>"
                 this.get('model').load();
-            }
-            else{
-                var template=this.template;
-                flickrImageList.each(function(photo){
-                    console.log('Render------>',photo.toJSON());
-                    html=html+Y.Lang.sub(template,photo.toJSON());
+            } else {
+                var template = this.template;
+                flickrImageList.each(function(photo) {
+                    html = html + Y.Lang.sub(template, photo.toJSON());
                 })
             }
             container.setHTML(html);
-            Y.mobileContainerView.syncUI();
             return this;
         }
     }, {
@@ -108,10 +164,13 @@ YUI.add('flickrImageLoader', function(Y) {
                 valueFn: function() {
                     return new Y.FlickrImageList();
                 }
+            },
+            parentApp: {
+                value: null
             }
         }
     });
 
 }, '0.0.0', {
-    requires: ['json', 'model','view', 'yql','node','events','model-list']
+    requires: ['json', 'model', 'view', 'yql', 'node', 'events', 'model-list']
 });

@@ -8,7 +8,9 @@
             <div class="yui3-g">
                 <div class="yui3-u-1-3">
                     <div class="image-wrap">
-                    <img src="http://farm{farm}.staticflickr.com/{server}/{id}_{secret}_q.jpg">
+                    <a href="/photo/{id}">
+                        <img src="http://farm{farm}.staticflickr.com/{server}/{id}_{secret}_q.jpg">
+                    </a>
                     </div>
                 </div>
                 <div class="yui3-u-2-3">
@@ -24,10 +26,8 @@
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.8.0/build/cssreset-context/cssreset-context-min.css">
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.8.0/build/cssgrids/grids-min.css">
     <link rel="stylesheet" type="text/css" href="yui-mobile-core.css">
-    <script src="yui-mobile-core.js"></script>
     <script src="yui-mobile-model-flickr.js"></script>
     <script src="yui-mobile-boilerplate-app.js"></script>
-
     <style type="text/css">
         .flickr-images .image-wrap{
             overflow:hidden;
@@ -59,16 +59,17 @@
         <div id="content">
                     <ul>
                         <li>
-                            <h2>This is built using ScrollView</h2>
+                            <h2>Flickr Photos</h2>
+                            <p>This is built using YUI's ScrollView. </p>
                             <p>
-                            This is built using YUI's ScrollView. ScrollView's main use case is to provide a scrollable content widget for touch devices on which overflow scrollbars are not natively supported. However, it is built on top of YUI's cross-platform/browser gesture and transition layers, so it can also be used to provide flickable scrolling on mouse-based devices across on all the A-grade browsers.
+                            ScrollView's main use case is to provide a scrollable content widget for touch devices on which overflow scrollbars are not natively supported. However, it is built on top of YUI's cross-platform/browser gesture and transition layers, so it can also be used to provide flickable scrolling on mouse-based devices across on all the A-grade browsers.</p>
                             <a href="#hello">sdfasd asdf as</a>
-                            </p>
+                            
                         </li>
                         <li id="flickrImageList">
                            
                         </li>
-                </ul>
+                    </ul>
         </div>
     </div>
 </body>
