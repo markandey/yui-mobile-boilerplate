@@ -1,4 +1,4 @@
-YUI().use('app-base','flickrImageLoader', function (Y) {
+YUI().use('app-base','flickrImageLoader','scrollview', function (Y) {
         Y.BoilerPlateApp = Y.Base.create('boilerPlateApp', Y.App, [], {
             render: function () {
                 Y.BoilerPlateApp.superclass.render.apply(this, arguments);
