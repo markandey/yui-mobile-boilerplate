@@ -1,4 +1,3 @@
-yui-mobile-boilerplate
+YUI Mobile Boilerplate 
 ======================
 
-YUI Mobile Boilerplate
