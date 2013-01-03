@@ -20,6 +20,15 @@ YUI.add('flickrImageLoader', function(Y) {
                 callback(null, null);
                 return
             }
+        },
+        parse: function(res) {
+            for(p in res){
+                if(res.hasOwnProperty(p) ){
+                    this.set(p,res[p]);
+                }
+            }
+            this.fire('change', {});
+            return;
         }
 
     }, {
@@ -86,16 +95,23 @@ YUI.add('flickrImageLoader', function(Y) {
         template: '<img src="http://farm{farm}.staticflickr.com/{server}/{id}_{secret}.jpg">',
         initializer: function() {
             var flickrImage = this.get('model');
-            flickrImage.after('change', this.render, this);
+            flickrImage.after('change',Y.bind(this.render, this));
+            
         },
         render: function() {
             var container = this.get('container'),
                 html = '',
                 flickrImage = this.get('model');
             var template = this.template;
+            if(!container._node){
+                return;
+            }
             if(!flickrImage.get('secret')){
                 flickrImage.load({'id':this.get('model').get('id') });    
+                container.setHTML('Loading......');
+                return;
             }
+            
             container.setHTML(Y.Lang.sub(template, flickrImage.toJSON()));
             return this;
         }
@@ -103,7 +119,7 @@ YUI.add('flickrImageLoader', function(Y) {
         ATTRS: {
             container: {
                 valueFn: function() {
-                    return Y.Node.one('#flickrImageList');
+                    return Y.Node.one('#flickrImageView');
                 }
             },
             model: {

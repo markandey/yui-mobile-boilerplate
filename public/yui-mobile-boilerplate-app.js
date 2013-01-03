@@ -27,7 +27,6 @@ YUI().use('app-base','flickrImageLoader','scrollview', function (Y) {
             },
             showFlickrPhoto:function (id){
                 var that=this;
-                console.log(id);
                 var photoViewInstance=new Y.FlickrImageView({
                     model:new Y.FlickrImage({"id":id})
                 });
@@ -46,7 +45,7 @@ YUI().use('app-base','flickrImageLoader','scrollview', function (Y) {
         });
         var app = new Y.BoilerPlateApp({
             views: {    
-                        "mainView":{type:"FlickrImageListView"},
+                        "mainView":{type:"FlickrImageListView",preserve: true},
                         "photoView":{type:"FlickrImageView"}
                     },
             container    : '#content ul',
